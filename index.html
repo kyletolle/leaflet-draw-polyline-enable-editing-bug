@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Trying to find the polyline editing enable bug in Leaflet.draw</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="mapbox.css">
+    <link rel="stylesheet" href="leaflet.draw.css">
+    <style>
+      html, body, #map { margin: 0; height: 100%; width: 100%; }
+    </style>
+    <script src="mapbox.js"></script>
+    <script src="leaflet.draw.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      // Just set up the map like normal...
+      var map = L.map('map').setView([0, 0], 3);
+      // http://switch2osm.org/using-tiles/getting-started-with-leaflet/
+      var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+      var osm = new L.TileLayer(osmUrl, {minZoom: 2, maxZoom: 12, attribution: osmAttrib})
+      map.addLayer(osm);
+
+      var polylineGeojson = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              76.2890625,
+              67.20403234340081
+            ],
+            [
+              37.6171875,
+              41.508577297439324
+            ],
+            [
+              23.5546875,
+              61.77312286453148
+            ],
+            [
+              12.3046875,
+              33.137551192346145
+            ],
+            [
+              14.765625,
+              -0.3515602939922709
+            ],
+            [
+              26.3671875,
+              -18.646245142670608
+            ],
+            [
+              11.6015625,
+              -31.353636941500987
+            ]
+          ]
+        }
+      };
+      var polylineLayer = L.geoJson(polylineGeojson).getLayers()[0]
+
+      var pointGeojson = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -35.595703125,
+            -5.615985819155327
+          ]
+        }
+      };
+      var pointLayer = L.geoJson(pointGeojson).getLayers()[0]
+
+      // Initialise the FeatureGroup to store editable layers
+      var drawnItems = new L.geoJson();
+      map.addLayer(drawnItems);
+
+      // Initialise the draw control and pass it the FeatureGroup of editable layers
+      var drawControl = new L.Control.Draw({
+          edit: { featureGroup: drawnItems }
+      });
+      map.addControl(drawControl);
+
+      map.on('draw:created', function(event) {
+          drawnItems.addLayer(event.layer);
+      });
+
+      // We have some items that we would like to manage separately than the drawnItems, but still allow them to be when they're clicked on, but NOT through the Leaflet.draw interface.
+      var viewableItems = new L.geoJson();
+      viewableItems.addLayer(polylineLayer);
+      viewableItems.addLayer(pointLayer);
+      viewableItems.addTo(map);
+
+      var enterEditingMode = function (event) {
+        var layer = event.target;
+        layer.editing.enable();
+      };
+
+      polylineLayer.on('click', enterEditingMode);
+      pointLayer.on(   'click', enterEditingMode);
+    </script>
+  </body>
+</html>
+
