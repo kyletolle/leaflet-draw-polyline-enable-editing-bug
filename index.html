@@ -74,6 +74,39 @@
       };
       var pointLayer = L.geoJson(pointGeojson).getLayers()[0]
 
+      var polygonGeojson = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                53.96484375,
+                -4.565473550710278
+              ],
+              [
+                53.96484375,
+                49.83798245308484
+              ],
+              [
+                72.94921875,
+                49.83798245308484
+              ],
+              [
+                72.94921875,
+                -4.565473550710278
+              ],
+              [
+                53.96484375,
+                -4.565473550710278
+              ]
+            ]
+          ]
+        }
+      }
+      var polygonLayer = L.geoJson(polygonGeojson).getLayers()[0]
+
       // Initialise the FeatureGroup to store editable layers
       var drawnItems = new L.geoJson();
       map.addLayer(drawnItems);
@@ -92,6 +125,7 @@
       var viewableItems = new L.geoJson();
       viewableItems.addLayer(polylineLayer);
       viewableItems.addLayer(pointLayer);
+      viewableItems.addLayer(polygonLayer);
       viewableItems.addTo(map);
 
       var enterEditingMode = function (event) {
@@ -101,6 +135,7 @@
 
       polylineLayer.on('click', enterEditingMode);
       pointLayer.on(   'click', enterEditingMode);
+      polygonLayer.on(   'click', enterEditingMode);
     </script>
   </body>
 </html>
